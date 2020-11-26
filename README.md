@@ -28,7 +28,7 @@
 - [Listing : Geth Deployment](cluster-davar-eth/100-eth/40-miner/30-deployment.yml)
 - [Listing : Geth transaction node Service](cluster-davar-eth/100-eth/50-tx/10-service.yml)
 - [Listing : Geth transaction node Deployment](cluster-davar-eth/100-eth/50-tx/30-deployment.yml)
-- [Listing : Function for returning details on the last block in the Blockchain](/utils/last-block/handler.py)<!-- @IGNORE PREVIOUS: link -->
+- [Listing : Function for returning details on the last block in the Blockchain](/utils/function/last-block/handler.py)<!-- @IGNORE PREVIOUS: link -->
 
 [Ethstats]: https://github.com/cubedro/eth-netstats
 [Geth]: https://geth.ethereum.org/
