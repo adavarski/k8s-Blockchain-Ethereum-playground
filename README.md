@@ -127,7 +127,10 @@ $ sudo systemctl enable resolvconf.service
 k3s is "Easy to install. A binary of less than 40 MB. Only 512 MB of RAM required to run." this allows us to utilized Kubernetes for managing the Gitlab application container on a single node while limited the footprint of Kubernetes itself. 
 
 ```bash
-curl -sfL https://get.k3s.io | sh -
+$ export K3S_CLUSTER_SECRET=$(head -c48 /dev/urandom | base64)
+# copy the echoed secret
+$ echo $K3S_CLUSTER_SECRET
+$ curl -sfL https://get.k3s.io | sh -
 ```
 ### Remote Access with `kubectl`
 
@@ -437,6 +440,63 @@ kubectl delete -f ./cluster-davar-eth/000-global/00-namespace.yml
 ```
 Note: all resources/objects into data namespace will be auto-removed by k8s.
 
+### Note1: Add k3s worker (bare-metal) with NVIDIA Runtime
+
+```
+
+# Install Ubuntu 18.04 on some bare-metal server .
+$ sudo su
+$ apt update && apt upgrade -y
+$ apt install -y apt-transport-https \
+ca-certificates gnupg-agent \
+software-properties-common
+$ apt install -y linux-headers-$(uname -r)
+# Ceph block device kernel module (for Ceph support)
+$ modprobe rbd
+# NVIDIA GeForce GPU support. Install GPU drivers along with the nvidia-container-runtime plug-in for
+containerd, the default container runtime for k3s.
+$ apt install ubuntu-drivers-common
+$ modprobe ipmi_devintf
+$ add-apt-repository -y ppa:graphics-drivers
+$ curl -s -L \
+   https://nvidia.github.io/nvidia-docker/gpgkey \
+   | sudo apt-key add -
+$ curl -s -L https://nvidia.github.io/nvidia-container-runtime/
+ubuntu18.04/nvidia-container-runtime.list | tee /etc/apt/
+sources.list.d/nvidia-container-runtime.list   
+$ apt-get install -y nvidia-driver-440
+$ apt-get install -y nvidia-container-runtime
+$ apt-get install -y nvidia-modprobe nvidia-smi
+$ /sbin/modprobe nvidia
+$ /sbin/modprobe nvidia-uvm  
+$ reboot
+$ nvidia-smi
+# k3s with NVIDIA Runtime
+sudo su -
+export K3S_CLUSTER_SECRET="<PASTE VALUE>"
+export K3S_URL="https://dev-k3s.davar.com:6443"
+export INSTALL_K3S_SKIP_START=true
+$ curl -sfL https://get.k3s.io | \
+sh -s - agent 
+$ mkdir -p /var/lib/rancher/k3s/agent/etc/containerd/
+$ cat <<"EOF" > \
+/var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.opt]
+  path = "/var/lib/rancher/k3s/agent/containerd"
+[plugins.cri]
+  stream_server_address = "127.0.0.1"
+  stream_server_port = "10010"
+  sandbox_image = "docker.io/rancher/pause:3.1"
+[plugins.cri.containerd.runtimes.runc]
+  runtime_type = "io.containerd.runtime.v1.linux"
+[plugins.linux]
+  runtime = "nvidia-container-runtime"
+EOF
+$ systemctl start k3s
+$ kubectl label node lab-metal kubernetes.io/role=gpu
+# Edit k8s Geth miners yaml ( ./cluster-davar-eth/100-eth/40-miner/30-deployment.yml) to run Pods on lab-metal using label:gpu
+
+```
 
 ## Technology Reference
 - [Ethereum]
