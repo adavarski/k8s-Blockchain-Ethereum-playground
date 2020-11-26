@@ -1,5 +1,9 @@
 # Platforming Blockchain: Ethereum (Private Network)
 
+This Ethereum private network network is a highly constrained, miniature replica of the public Ethereum network. Private Blockchain networks such as this are
+useful for building and deploying experimental nodes, smart contract development, and connecting any aspect of the Blockchain operations into
+the more extensive data and application platform developed
+
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain_private_Ethereum_network.png" width="800">
 
 ## Prerequisite
