@@ -90,6 +90,7 @@ davar.local. IN  MX  10  mail.davar.com.
 gitlab.dev     IN       A       192.168.0.101
 reg.gitlab.dev IN       A       192.168.0.101
 dev-k3s        IN       A       192.168.0.101
+stats.eth      IN       A       192.168.0.101
 
 ;CNAME Record
 www     IN      CNAME    www.davar.com.
