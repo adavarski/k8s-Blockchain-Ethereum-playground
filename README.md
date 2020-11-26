@@ -1,4 +1,4 @@
-# Platforming Blockchain: Ethereum
+# Platforming Blockchain: Ethereum (Private Network)
 
 
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain_private_Ethereum_network.png" width="800">
