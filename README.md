@@ -401,7 +401,7 @@ $ geth attach http://localhost:8545
 Geth’s interactive JavaScript console is a great way to explore the API. However, Ethereum provides a variety of mature client libraries for
 building applications that interact with the Ethereum Blockchain. 
 
-### Pythone: Geth 
+### Python: Geth 
 
 Ethereum’s Web3 Python library example:
 
