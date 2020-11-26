@@ -2,7 +2,9 @@
 
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain_private_Ethereum_network.png" width="800">
 
-## Prerequisite: DNS 
+## Prerequisite
+
+### DNS setup
 
 Example: Setup local DNS server
 
@@ -115,14 +117,14 @@ $ sudo systemctl enable resolvconf.service
 
 ```
 
-## Install k3s
+### Install k3s
 
 k3s is "Easy to install. A binary of less than 40 MB. Only 512 MB of RAM required to run." this allows us to utilized Kubernetes for managing the Gitlab application container on a single node while limited the footprint of Kubernetes itself. 
 
 ```bash
 curl -sfL https://get.k3s.io | sh -
 ```
-## Remote Access with `kubectl`
+### Remote Access with `kubectl`
 
 From your local workstation you should be able to issue a curl command to Kubernetes:
 
@@ -194,18 +196,16 @@ deployment.apps/coredns configured
 service/kube-dns unchanged
 ```
 
-## Crate eth namespace: data
+### Crate eth namespace: data
 
 ```bash
 kubectl apply -f ./cluster-davar-eth/000-global/00-namespace.yml
 ```
 
-## Install Cert Manager / Self-Signed Certificates
+### Install Cert Manager / Self-Signed Certificates
 
 Note: Let's Encrypt will be used with Cert Manager for PRODUCTION/PUBLIC when we have internet accessble public IPs and public DNS domain. davar.com is local domain, so we use Self-Signed Certificates, Let's Encrypt is using public DNS names and if you try to use Let's Encrypt for local domain and IPs you will have issue:
 
-
-Install Cert Manager 
 
 ```bash
 # Kubernetes 1.16+
@@ -252,8 +252,80 @@ kubectl apply -f ./cluster-davar-eth/000-global/003-issuer.yaml
 kubectl apply -f ./cluster-davar-eth/000-global/005-clusterissuer.yml
 ```
 
+## Ethereum private network deploy 
 
+### Bootnodes
 
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/10-bootnode/10-service.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/10-bootnode/30-deployment.yml
+
+```
+### Bootnode Registrar
+
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/20-bootnode-reg/10-service.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/20-bootnode-reg/30-deployment.yml
+
+```
+### Ethstats
+Note:  Secret WS_SECRET: "uGYQ7lj55FqFxdyIwsv1" is used later in the command-line arguments supplied to Geth nodes.
+
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/30-ethstats/10-service.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/30-ethstats/15-secret.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/30-ethstats/30-deployment.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/30-ethstats/50-ingress.yml
+
+```
+Visit https://stats.eth.davar.com in a web browser. There should be no data until Geth nodes begin reporting as configured in
+the following sections.
+
+### Geth Miners
+
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/40-miner/15-secret.yml
+```
+Install Geth on a local workstation (ref: https://geth.ethereum.org/downloads/). For Ubuntu:
+
+```
+The easiest way to install go-ethereum on Ubuntu-based distributions is with the built-in launchpad PPAs (Personal Package Archives). Use provided a single PPA repository that contains both our stable and development releases for Ubuntu versions trusty, xenial, zesty and artful.
+
+To enable our launchpad repository run:
+
+sudo add-apt-repository -y ppa:ethereum/ethereum
+Then install the stable version of go-ethereum:
+
+sudo apt-get update
+sudo apt-get install ethereum
+Or the develop version via:
+
+sudo apt-get update
+sudo apt-get install ethereum-unstable
+The abigen, bootnode, clef, evm, geth, puppeth, rlpdump, and wnode commands are then available on your system in /usr/bin/.
+
+Find the different options and commands available with geth --help
+```
+After creating multiple accounts with the geth account new command, copy and save the “Public address of the key:” from the output.
+Next, edit [Geth ConfigMap](cluster-davar-eth/100-eth/40-miner/20-configmap.yml) for Geth. Update the alloc section of the genesis.json with the
+newly created accounts. The genesis.json file defined within the ConfigMap configures the first block of an Ethereum Blockchain. Any node wishing
+to join the private network must first initialize against this Ethereum Genesis file. Both miner and transaction nodes described in the following
+are configured to mount the genesis.json file defined as a key in the ConfigMap.
+
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/40-miner/20-configmap.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/40-miner/30-deployment.yml
+
+```
+### Geth Transaction Nodes
+
+```
+kubectl apply -f ./cluster-davar-eth/100-eth/50-tx/10-service.yml
+kubectl apply -f ./cluster-davar-eth/100-eth/50-tx/30-deployment.yml
+
+```
+
+At this stage, there should now be five nodes reporting into the Ethstats Dashboard configured earlier, consisting of three miners and two transaction nodes:
 
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain-Ethereum-stats-private-Ethereum-nodes-reporting.png" width="800">
 
