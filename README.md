@@ -333,8 +333,100 @@ At this stage, there should now be five nodes reporting into the Ethstats Dashbo
 
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain-Ethereum-stats-private-Ethereum-nodes-reporting.png" width="800">
 
+## Observing 
 
+### Geth Attach
+Geth offers an interactive console (https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console) for interacting with its API. One of the
+easiest ways to experiment with the API involves using geth to attach to another local instance of geth. The following example executes geth on
+one of the three miner nodes and interacts with the running miner (Example geth console output):
+```
+$ kubectl get all -n data
+NAME                                       READY   STATUS    RESTARTS   AGE
+pod/eth-bootnode-85847546f6-gmbwl          2/2     Running   0          34m
+pod/eth-bootnode-85847546f6-zsjrr          2/2     Running   0          34m
+pod/eth-bootnode-registrar-b458ccb-mgfc2   1/1     Running   0          31m
+pod/eth-ethstats-5f7fdbd57-l6h64           1/1     Running   0          27m
+pod/eth-geth-miner-6b998b7565-m9vwm        1/1     Running   0          2m49s
+pod/eth-geth-miner-6b998b7565-2hwxf        1/1     Running   0          2m49s
+pod/eth-geth-miner-6b998b7565-zpxjk        1/1     Running   0          2m49s
+pod/eth-geth-tx-f8c7db78c-p2n8c            1/1     Running   0          52s
+pod/eth-geth-tx-f8c7db78c-dfpdv            1/1     Running   0          52s
 
+NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)              AGE
+service/eth-bootnode             ClusterIP   None            <none>        30301/UDP,8080/TCP   35m
+service/eth-bootnode-registrar   ClusterIP   10.43.134.135   <none>        80/TCP               31m
+service/eth-ethstats             ClusterIP   10.43.60.27     <none>        8080/TCP             29m
+service/eth-geth-tx              ClusterIP   10.43.156.10    <none>        8545/TCP,8546/TCP    75s
+
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/eth-bootnode             2/2     2            2           34m
+deployment.apps/eth-bootnode-registrar   1/1     1            1           31m
+deployment.apps/eth-ethstats             1/1     1            1           27m
+deployment.apps/eth-geth-miner           3/3     3            3           2m49s
+deployment.apps/eth-geth-tx              2/2     2            2           52s
+
+NAME                                             DESIRED   CURRENT   READY   AGE
+replicaset.apps/eth-bootnode-85847546f6          2         2         2       34m
+replicaset.apps/eth-bootnode-registrar-b458ccb   1         1         1       31m
+replicaset.apps/eth-ethstats-5f7fdbd57           1         1         1       27m
+replicaset.apps/eth-geth-miner-6b998b7565        3         3         3       2m49s
+replicaset.apps/eth-geth-tx-f8c7db78c            2         2         2       52s
+
+At this stage, there should now be five nodes reporting into the Ethstats
+Dashboard configured earlier (see Figure 10-4), consisting of three miners
+and two transaction nodes.
+
+$ kubectl exec -it -n data eth-geth-miner-6b998b7565-m9vwm -- geth attach
+Welcome to the Geth JavaScript console!
+
+instance: Geth/v1.9.13-stable-cbc4ac26/linux-amd64/go1.14.2
+coinbase: 0x662c50ab9c34945f06df2112fd02b6d5490bd6c0
+at block: 0 (Thu Jan 01 1970 00:00:00 GMT+0000 (UTC))
+ datadir: /root/.ethereum
+ modules: admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 txpool:1.0 web3:1.0
+
+> eth.blockNumber
+```
+
+Communicate with geth from a local workstation by port-forwarding the eth-geth-tx Service, set up earlier, and attach a local geth to the forwarded Service.
+```
+$ kubectl port-forward svc/eth-geth-tx 8545 -n data
+Forwarding from 127.0.0.1:8545 -> 8545
+Forwarding from [::1]:8545 -> 8545
+```
+Open an additional terminal on the local workstation and attach geth:
+```
+$ geth attach http://localhost:8545
+```
+Geth’s interactive JavaScript console is a great way to explore the API. However, Ethereum provides a variety of mature client libraries for
+building applications that interact with the Ethereum Blockchain. 
+
+### Pythone: Geth 
+
+Ethereum’s Web3 Python library example:
+
+```
+$ cd ./utils/functions/last-block
+$ sudo apt-get install python3-venv python3-dev
+$ python3 -m venv venv
+$ source ./venv/bin/activate
+(venv) $ pip install wheel
+(venv) $ pip install hexbytes==0.2.0 web3==5.9.0
+(venv) $ pip freeze > requirements.txt
+
+# Test the last-block function on a local workstation by port-forwarding the eth-geth-tx service in one terminal and executing the Python script handler.py in another.Open a separate terminal and port-forward eth-geth-tx:
+$ kubectl port-forward svc/eth-geth-tx 8545:8545 -n data
+Forwarding from 127.0.0.1:8545 -> 8545
+Forwarding from [::1]:8545 -> 8545
+
+# Execute the Python script handler.py from the current (virtual environment enabled) terminal:
+
+(venv) $ export GETH_RPC_ENDPOINT=http://localhost:8545
+(venv) $ python3 ./handler.py
+{'statusCode': 200, 'body': {'difficulty': 1024, 'extraData': '0x', 'gasLimit': 134217728, 'gasUsed': 0, 'hash': '0xb7086ccb8dd16936959da84295a8147d3a676e6aa0dc90c466e85dcb4e9296e9', 'logsBloom': '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 'miner': '0x0000000000000000000000000000000000000000', 'mixHash': '0x0000000000000000000000000000000000000000000000000000000000000000', 'nonce': '0x0000000000000000', 'number': 0, 'parentHash': '0x0000000000000000000000000000000000000000000000000000000000000000', 'receiptsRoot': '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421', 'sha3Uncles': '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347', 'size': 507, 'stateRoot': '0xae6c9e9531e548d01a20b1e31d9da4709959da262dea1c6a164d2cd00e28ec7c', 'timestamp': 0, 'totalDifficulty': 1024, 'transactions': [], 'transactionsRoot': '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421', 'uncles': []}}
+
+$ deactivate
+```
 
 
 ## Technology Reference
