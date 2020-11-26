@@ -432,7 +432,7 @@ $ deactivate
 ```
 kubectl delete -f ./cluster-davar-eth/000-global/00-namespace.yml
 ```
-Note: data namespace (all resources/objects into data namespace will be auto-removed by k8s)
+Note: all resources/objects into data namespace will be auto-removed by k8s.
 
 
 ## Technology Reference
