@@ -444,7 +444,7 @@ Note: all resources/objects into data namespace will be auto-removed by k8s.
 
 ```
 
-# Install Ubuntu 18.04 on some bare-metal server .
+# Install Ubuntu 18.04 on some bare-metal server/workstation with an NVIDIA GeForce GPU (Gaming)  .
 $ sudo su
 $ apt update && apt upgrade -y
 $ apt install -y apt-transport-https \
@@ -493,8 +493,8 @@ $ cat <<"EOF" > \
   runtime = "nvidia-container-runtime"
 EOF
 $ systemctl start k3s
-$ kubectl label node lab-metal kubernetes.io/role=gpu
-# Edit k8s Geth miners yaml ( ./cluster-davar-eth/100-eth/40-miner/30-deployment.yml) to run Pods on lab-metal using label:gpu
+$ kubectl label node gpu-metal kubernetes.io/role=gpu
+# Edit k8s Geth miners yaml ( ./cluster-davar-eth/100-eth/40-miner/30-deployment.yml) to run Pods on gpu-metal using label:gpu
 
 ```
 
