@@ -444,7 +444,7 @@ Note: all resources/objects into data namespace will be auto-removed by k8s.
 
 ```
 
-# Install Ubuntu 18.04 on some bare-metal server/workstation with an NVIDIA GeForce GPU (Gaming)  .
+# Install Ubuntu 18.04 on some bare-metal server/workstation with an NVIDIA GeForce GPU (for example Gaming NVIDIA GeForce 1070 GPU)   .
 $ sudo su
 $ apt update && apt upgrade -y
 $ apt install -y apt-transport-https \
