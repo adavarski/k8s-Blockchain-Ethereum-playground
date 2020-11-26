@@ -440,7 +440,7 @@ kubectl delete -f ./cluster-davar-eth/000-global/00-namespace.yml
 ```
 Note: all resources/objects into data namespace will be auto-removed by k8s.
 
-### Note1: Add k3s worker (bare-metal) with NVIDIA Runtime
+### Note1: Add k3s worker with NVIDIA Runtime (bare-metal)
 
 ```
 
