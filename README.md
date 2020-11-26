@@ -1,8 +1,16 @@
 # Platforming Blockchain: Ethereum
 
+
+<img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain_private_Ethereum_network.png" width="800">
+<img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain-Ethereum-stats-private-Ethereum-nodes-reporting.png" width="800">
+
+
+
+
+
 ## Technology Reference
 - [Ethereum]
-  - [Geth]
+- [Geth]
 - [Ethstats]
 
 ## Listings
