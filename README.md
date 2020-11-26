@@ -427,6 +427,11 @@ Forwarding from [::1]:8545 -> 8545
 
 $ deactivate
 ```
+## Clean data namespace (all resources/objects into data namespace will be auto-removed by k8s)
+
+```
+kubectl delete -f ./cluster-davar-eth/000-global/00-namespace.yml
+```
 
 
 ## Technology Reference
