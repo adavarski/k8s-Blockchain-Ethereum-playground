@@ -478,6 +478,7 @@ $ deactivate
 ### JupyterLab 
 
 Jupyter Notebooks are a browser-based (or web-based) IDE (integrated development environments)
+
 Build custom JupyterLab docker image
 ```
 $ cd ./utils/JupyterLab
