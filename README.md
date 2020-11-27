@@ -545,7 +545,7 @@ Create a new Python 3 Jupyter Notebook; copy and execute the following code exam
 ```
 pip install web3
 ```
-Import the Python libraries web3, 32 json, and time:
+Import the Python libraries web3, json, and time:
 ```
 import web3, json, time
 import pandas as pd
@@ -567,11 +567,12 @@ else:
     print("Not connected")
 ```
 Example output:
+```
 Connected: http://eth-geth-tx:8545
 Peers: 4
 Chain ID: 27587
 Last block: 5549
-
+```
 Check the eth balance of the accounts pre-funded in the Genesis block
 defined earlier:
 ```
@@ -583,9 +584,10 @@ print(f"Account 1: {web3.fromWei(a1_bal, 'ether')} ether")
 print(f"Account 2: {web3.fromWei(a2_bal, 'ether')} ether")
 ```
 Example output:
+```
 Account 1: 100 ether
 Account 2: 200 ether
-
+```
 Add the following code to create a transaction, transferring one ether
 to account_2:
 ```
@@ -601,12 +603,13 @@ tx = {
 tx
 ```
 Example output:
+```
 {'nonce': 15,
 'to': '0x8ab8F3fc6c660d3f0B22490050C843cafd2c0AAC',
 'value': 1000000000000000000,
 'gas': 2000000,
 'gasPrice': 50000000000}
-
+```
 The private key file and password are required to sign the transaction
 as account_1. Within the JupyterLab environment, create a text file named
 pass1.txt and populate it with the password used to create account_1
@@ -628,6 +631,7 @@ signed_tx = web3.eth.account.signTransaction(tx, p_1)
 signed_tx
 ```
 Example output:
+```
 AttributeDict({'rawTransaction': HexBytes('0xf86d0f850ba43b74
 00831e8480948ab8f3fc6c660d3f0b22490050c843cafd2c0aac880de0b6b3
 a7640000801ca0917ae987a8c808cf01221dad4571fd0b1b8f5429d13c469
@@ -640,6 +644,7 @@ ace5f2d38e802da09c06769'),
 's': 47182743427096773798449059805443774712403275692049277894
 020390344384483433247,
 'v': 28}
+```
 
 Send the signed transaction to the transaction node and retrieve the
 resulting hash. This hash is the unique identifier for the transaction on the
@@ -650,8 +655,10 @@ tx_hash = web3.eth.sendRawTransaction(signed_tx)
 web3.toHex(tx_hash)
 ```
 Example output:
+```
 '0x9de62dc620274e2c9dba2194d90c245a933af8468ace5f2d38e802d
 a09c06769'
+```
 
 After a node receives the transaction, it propagates to all nodes for
 validation and inclusion into the pending transaction pool, ready to be
@@ -673,7 +680,8 @@ while type(blockNumber) is not int:
 tx
 ```
 Example output:
-Check #12
+```
+Check #451
 CPU times: user 129 ms, sys: 904 μs, total: 130 ms
 Wall time: 11.1 s
 AttributeDict({'blockHash': HexBytes('0x676a24aa8117b51958031a2
@@ -694,7 +702,7 @@ AttributeDict({'blockHash': HexBytes('0x676a24aa8117b51958031a2
 f62f37300ed17cb7414'),
 's': HexBytes('0x3ea3b4f5f8e4c10e4f30cc5b8a7ff0a833d8714f20744
 c289dee86006af420c8')})
-
+```
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/JupyterLab-python-exercises.png" width="800">
 
 
