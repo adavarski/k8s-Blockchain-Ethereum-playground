@@ -314,6 +314,48 @@ The abigen, bootnode, clef, evm, geth, puppeth, rlpdump, and wnode commands are 
 
 Find the different options and commands available with geth --help
 ```
+Create two or more Ethereum accounts. The Ethereum Genesis file defined in the following ConfigMap instructs the new Blockchain to pre-fund these accounts (in the first block) with a specified amount of Ether (Ethereum cryptocurrency) available for use within the private network.
+
+Example:
+```
+Password: Tesal0niki! 
+
+
+$ geth account new
+INFO [11-26|16:15:21.792] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [11-26|16:15:21.793] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Your new account is locked with a password. Please give a password. Do not forget this password.
+Password: 
+Repeat password: 
+
+Your new key was generated
+
+Public address of the key:   0xC6C8dAB6dF7Af408D7bB7E7d12A7e9A71aD6C465
+Path of the secret key file: /home/davar/.ethereum/keystore/UTC--2020-11-26T14-16-16.634178075Z--c6c8dab6df7af408d7bb7e7d12a7e9a71ad6c465
+
+- You can share your public address with anyone. Others need it to interact with you.
+- You must NEVER share the secret key with anyone! The key controls access to your funds!
+- You must BACKUP your key file! Without the key, it's impossible to access account funds!
+- You must REMEMBER your password! Without the password, it's impossible to decrypt the key!
+
+$ geth account new
+INFO [11-26|16:16:52.229] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [11-26|16:16:52.229] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Your new account is locked with a password. Please give a password. Do not forget this password.
+Password: 
+Repeat password: 
+
+Your new key was generated
+
+Public address of the key:   0x435D0A3c9C0782B31b822Ab12C627e0938f4dfd6
+Path of the secret key file: /home/davar/.ethereum/keystore/UTC--2020-11-26T14-17-04.096273966Z--435d0a3c9c0782b31b822ab12c627e0938f4dfd6
+
+- You can share your public address with anyone. Others need it to interact with you.
+- You must NEVER share the secret key with anyone! The key controls access to your funds!
+- You must BACKUP your key file! Without the key, it's impossible to access account funds!
+- You must REMEMBER your password! Without the password, it's impossible to decrypt the key!
+```
+
 After creating multiple accounts with the geth account new command, copy and save the “Public address of the key:” from the output.
 Next, edit [Geth ConfigMap](cluster-davar-eth/100-eth/40-miner/20-configmap.yml) for Geth. Update the alloc section of the genesis.json with the
 newly created accounts. The genesis.json file defined within the ConfigMap configures the first block of an Ethereum Blockchain. Any node wishing
@@ -337,7 +379,7 @@ At this stage, there should now be five nodes reporting into the Ethstats Dashbo
 
 <img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/Blockchain-Ethereum-stats-private-Ethereum-nodes-reporting.png" width="800">
 
-## Observing 
+## Observing and Exercises
 
 ### Geth Attach
 Geth offers an interactive console (https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console) for interacting with its API. One of the
@@ -433,6 +475,250 @@ Forwarding from [::1]:8545 -> 8545
 
 $ deactivate
 ```
+### JupyterLab 
+
+Jupyter Notebooks are a browser-based (or web-based) IDE (integrated development environments)
+Build custom JupyterLab docker image
+```
+$ cd ./utils/JupyterLab
+$ docker build -t jupyterlab-eth .
+$ docker tag jupyterlab-eth:latest davarski/jupyterlab-eth:latest
+$ docker login 
+$ docker push davarski/jupyterlab-eth:latest
+```
+Run Jupyter Notebook
+
+```
+$ sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config-jupyter
+$ sed -i "s/127.0.0.1/192.168.0.101/" k3s-config-jupyter
+$ docker run --rm --name jl -p 8888:8888 \
+   -v "$(pwd)":"/home/jovyan/work" \
+   -v "$HOME/.kube/k3s-config-jupyter":"/home/jovyan/.kube/config" \
+   --user root \
+   -e GRANT_SUDO=yes \
+   -e JUPYTER_ENABLE_LAB=yes -e RESTARTABLE=yes \
+   davarski/jupyterlab-eth:latest
+```
+Example:
+```
+$ docker run --rm --name jl -p 8888:8888 \
+>    -v "$(pwd)":"/home/jovyan/work" \
+>    -v "$HOME/.kube/k3s-config-jupyter":"/home/jovyan/.kube/config" \
+>    --user root \
+>    -e GRANT_SUDO=yes \
+>    -e JUPYTER_ENABLE_LAB=yes -e RESTARTABLE=yes \
+>    davarski/jupyterlab-eth:latest
+
+Set username to: jovyan
+usermod: no changes
+Granting jovyan sudo access and appending /opt/conda/bin to sudo PATH
+Executing the command: jupyter lab
+[I 21:37:15.811 LabApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 21:37:16.594 LabApp] Loading IPython parallel extension
+[I 21:37:16.614 LabApp] JupyterLab extension loaded from /opt/conda/lib/python3.7/site-packages/jupyterlab
+[I 21:37:16.614 LabApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
+[W 21:37:16.623 LabApp] JupyterLab server extension not enabled, manually loading...
+[I 21:37:16.638 LabApp] JupyterLab extension loaded from /opt/conda/lib/python3.7/site-packages/jupyterlab
+[I 21:37:16.638 LabApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
+[I 21:37:16.639 LabApp] Serving notebooks from local directory: /home/jovyan
+[I 21:37:16.639 LabApp] The Jupyter Notebook is running at:
+[I 21:37:16.639 LabApp] http://(e1696ffe20ab or 127.0.0.1):8888/?token=f0c6d63a7ffb4e67d132716e3ed49745e97b3e7fa78db28d
+[I 21:37:16.639 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 21:37:16.648 LabApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/jovyan/.local/share/jupyter/runtime/nbserver-17-open.html
+    Or copy and paste one of these URLs:
+        http://(e1696ffe20ab or 127.0.0.1):8888/?token=f0c6d63a7ffb4e67d132716e3ed49745e97b3e7fa78db28d
+```
+Open IDE in browser: http://127.0.0.1:8888/?token=f0c6d63a7ffb4e67d132716e3ed49745e97b3e7fa78db28d
+
+Within the Docker container (at localhost:8888), under the section titled Other within the running Jupyter Notebook, chose Terminal. Once the terminal launches, provide the following command to port-forward all services running in the data Namespace on the k8s cluster 
+```
+sudo kubefwd svc -n data
+```
+<img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/JupyterLab-kubefwd.png" width="800">
+
+The utility kubefwd connects and port-forwards Pods backing Services on a remote Kubernetes cluster to a matching set of DNS names and ports on the local workstation (in this case a Jupyter Notebook). Once kubefwd is running, connections to services such as http://eth-geth-tx:8545 are possible just as they are from within the remote cluster.
+
+Create a new Python 3 Jupyter Notebook; copy and execute the following code examples within individual cells.
+```
+pip install web3
+```
+Import the Python libraries web3, 32 json, and time:
+```
+import web3, json, time
+import pandas as pd
+from IPython.display import clear_output
+from web3.contract import ConciseContract
+from web3 import Web3
+from web3.auto.gethdev import w3
+```
+Connect to the Geth transaction node:
+```
+rpc_ep = "http://eth-geth-tx:8545"
+web3 = Web3(Web3.HTTPProvider(rpc_ep))
+if web3.isConnected():
+    print(f"Connected: {rpc_ep}")
+    print(f"Peers: {web3.net.peerCount}")
+    print(f"Chain ID: {web3.net.version}")
+    print(f"Last block: {web3.eth.blockNumber}")
+else:
+    print("Not connected")
+```
+Example output:
+Connected: http://eth-geth-tx:8545
+Peers: 4
+Chain ID: 27587
+Last block: 5549
+
+Check the eth balance of the accounts pre-funded in the Genesis block
+defined earlier:
+```
+account_1 = "0xFa4087D3688a289c9C92e773a7b46cb9CCf80353"
+account_2 = "0x8ab8F3fc6c660d3f0B22490050C843cafd2c0AAC"
+a1_bal = web3.eth.getBalance(account_1)
+a2_bal = web3.eth.getBalance(account_2)
+print(f"Account 1: {web3.fromWei(a1_bal, 'ether')} ether")
+print(f"Account 2: {web3.fromWei(a2_bal, 'ether')} ether")
+```
+Example output:
+Account 1: 100 ether
+Account 2: 200 ether
+
+Add the following code to create a transaction, transferring one ether
+to account_2:
+```
+nonce = web3.eth.getTransactionCount(account_1)
+print(f"Account 1 nonce: {nonce}")
+tx = {
+    'nonce': nonce,
+    'to': account_2,
+    'value': web3.toWei(1, 'ether'),
+    'gas': 2000000,
+    'gasPrice': web3.toWei('50', 'gwei'),
+}
+tx
+```
+Example output:
+{'nonce': 15,
+'to': '0x8ab8F3fc6c660d3f0B22490050C843cafd2c0AAC',
+'value': 1000000000000000000,
+'gas': 2000000,
+'gasPrice': 50000000000}
+
+The private key file and password are required to sign the transaction
+as account_1. Within the JupyterLab environment, create a text file named
+pass1.txt and populate it with the password used to create account_1
+earlier in this chapter, the first pre-funded account used in the alloc
+section of the genesis.json configuration. Additionally, upload the secret
+key file generated from the geth account new command (performed
+earlier in this chapter to create the pre-funded Ethereum accounts). Name
+the secret key account1.json
+
+Load the private key and password for account_1 and sign the
+transaction created earlier:
+```
+with open('pass1.txt', 'r') as pass_file:
+    kf1_pass = pass_file.read().replace('\n', '')
+with open("account1.json") as kf1_file:
+    enc_key = kf1_file.read();
+p_1 = w3.eth.account.decrypt(enc_key, kf1_pass)
+signed_tx = web3.eth.account.signTransaction(tx, p_1)
+signed_tx
+```
+Example output:
+AttributeDict({'rawTransaction': HexBytes('0xf86d0f850ba43b74
+00831e8480948ab8f3fc6c660d3f0b22490050c843cafd2c0aac880de0b6b3
+a7640000801ca0917ae987a8c808cf01221dad4571fd0b1b8f5429d13c469
+c72bc13647e9c1744a068507c8542ccdebb96e534d13a140ddcbdaedbfa3b
+a82dcbf86d4b196cc41b1f'),
+'hash': HexBytes('0x9de62dc620274e2c9dba2194d90c245a933af8468
+ace5f2d38e802da09c06769'),
+'r': 65802530150742945852115878650256413649726940478651153584
+824595116007827969860,
+'s': 47182743427096773798449059805443774712403275692049277894
+020390344384483433247,
+'v': 28}
+
+Send the signed transaction to the transaction node and retrieve the
+resulting hash. This hash is the unique identifier for the transaction on the
+Ethereum Blockchain:
+```
+signed_tx = signed_tx.rawTransaction
+tx_hash = web3.eth.sendRawTransaction(signed_tx)
+web3.toHex(tx_hash)
+```
+Example output:
+'0x9de62dc620274e2c9dba2194d90c245a933af8468ace5f2d38e802d
+a09c06769'
+
+After a node receives the transaction, it propagates to all nodes for
+validation and inclusion into the pending transaction pool, ready to be
+mined with the next block. The following code queries the connected
+transaction node every second until the transaction returns with a block
+number:
+```
+%%time
+blockNumber = None
+check = 0
+while type(blockNumber) is not int:
+    check += 1
+    tx = web3.eth.getTransaction(tx_hash)
+    blockNumber = tx.blockNumber
+    clear_output(wait=True)
+    print(f"Check #{check}\n")
+    if type(blockNumber) is not int:
+        time.sleep(1)
+tx
+```
+Example output:
+Check #12
+CPU times: user 129 ms, sys: 904 μs, total: 130 ms
+Wall time: 11.1 s
+AttributeDict({'blockHash': HexBytes('0x676a24aa8117b51958031a2
+863b17f91ed3356276036a9de7c596124a6234986'),
+'blockNumber': 8050,
+'from': '0xFa4087D3688a289c9C92e773a7b46cb9CCf80353',
+'gas': 2000000,
+'gasPrice': 50000000000,
+'hash': HexBytes('0xa3f02c685ff05b13b164afcbe11d2aa83d2dab3ff9
+72ee7008cc931282587cee'),
+'input': '0x',
+'nonce': 16,
+'to': '0x8ab8F3fc6c660d3f0B22490050C843cafd2c0AAC',
+'transactionIndex': 0,
+'value': 1000000000000000000,
+'v': 28,
+'r': HexBytes('0x89d052927901e8a7a727ebfb7709d4f9b99362c0f0001
+f62f37300ed17cb7414'),
+'s': HexBytes('0x3ea3b4f5f8e4c10e4f30cc5b8a7ff0a833d8714f20744
+c289dee86006af420c8')})
+
+<img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/JupyterLab-python-exercises.png" width="800">
+
+
+The transaction is now complete and its record immutably stored
+on the private blockchain. The network attempts to create a new block
+every 10 to 15 seconds by adjusting the required difficulty; however,
+this resource-constrained network with only three miners may fluctuate
+considerably. 
+
+The final code block in the exercise queries the transaction
+node for the last 100 blocks and plots the time delta between block
+timestamps:
+```
+df = pd.DataFrame(columns=['timestamp'])
+for i in range (0,100):
+    block = web3.eth.getBlock(tx.blockNumber - i)
+    df.loc[i] = [block.timestamp]
+df['delta'] = df.timestamp.diff().shift(-1) * -1
+df.reset_index().plot(x='index', y="delta", figsize=(12,5))
+```
+example output from the block timestamp delta plot:
+
+<img src="https://github.com/adavarski/k8s-Blockchain-Ethereum-playground/blob/main/pictures/JupyterLab-python-plot.png" width="800">
+
 ## Clean environment
 
 ```
