@@ -36,7 +36,8 @@ RUN pip install --no-cache \
     torchvision \
     fastai \
     octave_kernel \
-    jupyterlab-git 
+    jupyterlab-git
+
 # Jupyter lab and server extensions.
 RUN jupyter labextension install @jupyterlab/git
 RUN jupyter labextension install @jupyterlab/plotly-extension
