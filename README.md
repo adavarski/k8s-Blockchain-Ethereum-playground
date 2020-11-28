@@ -64,6 +64,11 @@ primary IN      A       192.168.0.101
 101      IN      PTR     gitlab.dev.davar.com.
 101      IN      PTR     reg.gitlab.dev.davar.com.
 101      IN      PTR     dev-k3s.davar.com.
+stats.eth      IN       A       192.168.0.101
+kib.data       IN       A       192.168.0.101
+nifi.data      IN       A       192.168.0.101
+faas.data      IN       A       192.168.0.101
+
 root@carbon:/etc/bind# cat forward.davar.com 
 ;
 ; BIND data file for local loopback interface
