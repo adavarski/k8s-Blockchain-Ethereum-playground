@@ -493,7 +493,7 @@ Run Jupyter Notebook
 
 ```
 $ sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config-jupyter
-$ sed -i "s/127.0.0.1/192.168.0.101/" k3s-config-jupyter
+$ sed -i "s/127.0.0.1/192.168.0.101/" ~/.kube/k3s-config-jupyter
 $ docker run --rm --name jl -p 8888:8888 \
    -v "$(pwd)":"/home/jovyan/work" \
    -v "$HOME/.kube/k3s-config-jupyter":"/home/jovyan/.kube/config" \
